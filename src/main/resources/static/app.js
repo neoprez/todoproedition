@@ -6,14 +6,14 @@ let emptyItem = {
 };
 
 var data = {
-    lists: [
-    ],
+    lists: [],
     selectedList: 0,
     newListModel: undefined,
     editListModel: undefined
 };
 
-const API_URL = 'http://localhost:8080';
+//const API_URL = 'http://localhost:8080';
+const API_URL = '';
 
 const apiService = {
     call: async function (path, method, body, extraHeaders) {
