@@ -7,9 +7,6 @@ let emptyItem = {
 
 var data = {
     lists: [
-        {
-            items: []
-        }
     ],
     selectedList: 0,
     newListModel: undefined,
