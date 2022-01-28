@@ -1,3 +1,16 @@
 .checkbox-list {
-    list-style: none;
+  list-style: none;
+}
+
+.checkbox-list-item .input-group-text {
+  background-color: transparent;
+  border: 0;
+  border-bottom: 1px solid #ced4da;
+  padding-left: 0;
+  border-radius: 0;
+}
+
+.checkbox-list-item .item-text {
+  border: 0;
+  border-bottom: 1px solid #ced4da;
 }

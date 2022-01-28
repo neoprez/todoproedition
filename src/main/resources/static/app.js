@@ -1,3 +1,8 @@
+const msnry = () => Masonry.data('.msnry');
+
+const relayout = () => {
+    msnry().layout();
+};
 
 let emptyItem = {
     text: '',
@@ -7,12 +12,12 @@ let emptyItem = {
 
 var data = {
     lists: [],
-    selectedList: 0,
+    selectedList: undefined,
     newListModel: undefined,
     editListModel: undefined
 };
 
-//const API_URL = 'http://localhost:8080';
+// const API_URL = 'http://localhost:8080';
 const API_URL = '';
 
 const apiService = {
@@ -63,6 +68,7 @@ var vm = new Vue({
             .then(data => {
                 newItem.id = data.id;
                 list.items.push(newItem);
+                relayout();
             });
         },
         updateItemCompleted: function (item) {
@@ -76,7 +82,6 @@ var vm = new Vue({
                 .then(resp => resp.json())
                 .then(data => {
                     that.lists = data;
-                    that.selectedList = 0;
                 });
         },
         updateListItem: function (listId, item) {
@@ -85,10 +90,11 @@ var vm = new Vue({
                 completed: item.completed
             }));
         },
-        deleteItem: function(listId, item) {
-            apiService.delete(`list/${listId}/listItem/${item.id}`)
+        deleteItem: function(list, item) {
+            apiService.delete(`list/${list.id}/listItem/${item.id}`)
             .then(() => {
-                this.lists[this.selectedList].items = this.lists[this.selectedList].items.filter(i => i.id !== item.id);
+                list.items = list.items.filter(i => i.id !== item.id);
+                relayout();
             })
             .catch(e => console.error("error", e));
         },
@@ -104,25 +110,29 @@ var vm = new Vue({
                     items: []
                 });
                 this.newListModel = undefined;
-                // var myModal = new bootstrap.Modal(document.getElementById('createBtn'), options)
+                Vue.nextTick(function() {
+                    msnry().reloadItems();
+                    relayout();
+                });
             });
+
         },
         editSelectedList: function() {
-            apiService.put(`list/${this.lists[this.selectedList].id}`, JSON.stringify({
+            apiService.put(`list/${this.selectedList.id}`, JSON.stringify({
                 title: this.editListModel
             })).then(() => {
-                this.lists[this.selectedList].title = this.editListModel;
+                this.selectedList.title = this.editListModel;
                 this.editListModel = undefined;
+                this.selectedList = undefined;
             }).catch((err) => console.log("Error during put", err));
         },
-        deleteList: function() {
+        deleteList: function(list) {
             let shouldDelete = confirm("Are you sure you want to delete this list?");
             if (shouldDelete) {
-                let listId = this.lists[this.selectedList].id;
-                apiService.delete(`list/${listId}`)
+                apiService.delete(`list/${list.id}`)
                 .then(() => {
-                    this.lists = this.lists.filter(list => list.id != listId);
-                    this.selectedList = 0;
+                    this.lists = this.lists.filter(l => l.id != list.id);
+                    relayout();
                 })
                 .catch((err) => console.error("Failed to delete list", err));
             }
